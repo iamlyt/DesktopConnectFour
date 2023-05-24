@@ -66,6 +66,7 @@ public class ConnectFour extends JFrame implements ActionListener {
         for (int i = 0; i < ROWS; i++) {
             if (boardCells[i][column].getText().equals(" ")) {
                 boardCells[i][column].setText(turn ? "X" : "O");
+//                boardCells[i][column].setBackground(turn ? Color.RED : Color.BLUE); // Optional: Set background color based on player turn
                 checkWin(i, column);
                 break;
             }
@@ -97,7 +98,7 @@ public class ConnectFour extends JFrame implements ActionListener {
                 count++;
                 if (count == 4) {
                     gameFinished = true;
-                    highlightWinningCells(i, column, i + 3, column);
+                    highlightWinningCells(i, column, i - 3, column);
                     return;
                 }
             } else {
@@ -121,6 +122,8 @@ public class ConnectFour extends JFrame implements ActionListener {
                 count = 0;
             }
         }
+
+
 
         // Check diagonal (top-left to bottom-right)
         int startDiagonalRow = row;
@@ -156,40 +159,64 @@ public class ConnectFour extends JFrame implements ActionListener {
         }
         if (endDiagonalRow - startDiagonalRow + 1 >= 4) {
             gameFinished = true;
-            highlightWinningCells(startDiagonalRow, startDiagonalColumn, endDiagonalRow, endDiagonalColumn);return;
+            highlightWinningCells(startDiagonalRow, startDiagonalColumn, endDiagonalRow, endDiagonalColumn);
         }
+
+        if (endDiagonalRow - startDiagonalRow + 1 >= 4) {
+            gameFinished = true;
+            highlightWinningCells(startDiagonalRow, startDiagonalColumn,
+                    endDiagonalRow, endDiagonalColumn);
+        }
+
     }
 
     private void highlightWinningCells(int startRow, int startColumn, int endRow, int endColumn) {
         Color winningColor = WINNING_COLOR;
+        String winningSymbol = boardCells[startRow][startColumn].getText();
 
         if (startRow == endRow) {
             // Horizontal sequence
-            for (int j = startColumn; j <= endColumn; j++) {
-                boardCells[startRow][j].setBackground(winningColor);
+            int startCol = Math.min(startColumn, endColumn);
+            int endCol = Math.max(startColumn, endColumn);
+            for (int col = startCol; col <= endCol; col++) {
+                JButton cell = boardCells[startRow][col];
+                if (cell.getText().equals(winningSymbol)) {
+                    cell.setBackground(winningColor);
+                }
             }
         } else if (startColumn == endColumn) {
             // Vertical sequence
-            for (int i = startRow; i <= endRow; i++) {
-                boardCells[i][startColumn].setBackground(winningColor);
+            int startRowIdx = Math.min(startRow, endRow);
+            int endRowIdx = Math.max(startRow, endRow);
+            for (int row = startRowIdx; row <= endRowIdx; row++) {
+                JButton cell = boardCells[row][startColumn];
+                if (cell.getText().equals(winningSymbol)) {
+                    cell.setBackground(winningColor);
+                }
             }
         } else if (endRow - startRow == endColumn - startColumn) {
             // Diagonal sequence (top-left to bottom-right)
-            int i = startRow;
-            int j = startColumn;
-            while (i <= endRow && j <= endColumn) {
-                boardCells[i][j].setBackground(winningColor);
-                i++;
-                j++;
+            int row = startRow;
+            int col = startColumn;
+            while (row <= endRow && col <= endColumn) {
+                JButton cell = boardCells[row][col];
+                if (cell.getText().equals(winningSymbol)) {
+                    cell.setBackground(winningColor);
+                }
+                row++;
+                col++;
             }
         } else if (endRow - startRow == startColumn - endColumn) {
             // Diagonal sequence (top-right to bottom-left)
-            int i = startRow;
-            int j = startColumn;
-            while (i <= endRow && j >= endColumn) {
-                boardCells[i][j].setBackground(winningColor);
-                i++;
-                j--;
+            int row = startRow;
+            int col = startColumn;
+            while (row <= endRow && col >= endColumn) {
+                JButton cell = boardCells[row][col];
+                if (cell.getText().equals(winningSymbol)) {
+                    cell.setBackground(winningColor);
+                }
+                row++;
+                col--;
             }
         }
     }
